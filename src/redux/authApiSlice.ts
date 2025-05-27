@@ -10,12 +10,20 @@ export const authApiSlice = createApi({
             query: (body) => ({
                 url: ENDPOINTS.AUTH.SIGN_UP,
                 method: 'POST',
-                body
+                data: body
+            })
+        }),
+        signIn: builder.mutation<any, any>({
+            query: (body) => ({
+                url: ENDPOINTS.AUTH.SIGN_IN,
+                method: 'POST',
+                data: body
             })
         })
     })
 })
 
 export const {
-    useSignUpMutation
+    useSignUpMutation,
+    useSignInMutation
 } = authApiSlice

@@ -8,6 +8,9 @@ import {
   Paper,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
+import { useSignUpMutation } from '../../../redux/authApiSlice';
+import { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 type SignUpFormValues = {
   name: string;
@@ -25,8 +28,22 @@ const SignUp: React.FC = () => {
     formState: { errors },
   } = useForm<SignUpFormValues>();
 
-  const onSubmit = (data: SignUpFormValues) => {
+  const navigate = useNavigate()
+
+  const [signUp, { isLoading }] = useSignUpMutation();
+
+  const onSubmit = async (data: SignUpFormValues) => {
     console.log('Sign Up Form Data:', { ...data, role: 'user' });
+    try{
+      const response = await signUp({ ...data, role: 'user' }).unwrap()
+      console.log('response:', response)
+      
+    }catch(error){
+      if(error instanceof AxiosError){
+        console.log('error:', error.response?.data)
+        alert(error.response?.data)
+      }
+    }
   };
 
   return (
@@ -114,7 +131,7 @@ const SignUp: React.FC = () => {
           />
 
           <Button type="submit" variant="contained" color="primary">
-            Sign Up
+            {isLoading ? 'Loading...' : 'Sign Up'}
           </Button>
         </Box>
       </Paper>

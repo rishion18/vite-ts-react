@@ -10,7 +10,7 @@ const AppRouter = () => {
             <Route path='/sign-in' element={<PAGES.AUTH.SIGN_IN/>} />
             <Route path='/sign-up' element={<PAGES.AUTH.SIGN_UP/>} />
             <Route element={<ProtectedRoute />}>
-               <Route path='/chat' element={<h1>chat</h1>} />
+               <Route path='/chat' element={<PAGES.CHAT_SCREEN/>} />
             </Route>
          </Routes>
       </BrowserRouter>

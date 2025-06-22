@@ -1,14 +1,17 @@
+import { Box } from "@mui/material";
 import { COMPONENTS } from "../../components";
+import React from "react";
 
 const ChatScreen: React.FC = () => {
 
+
   return (
-    <>
-    <div className="flex flex-row h-dvh">
-      <COMPONENTS.FEATURES.CHAT.CHAT_LIST />
-      <COMPONENTS.FEATURES.CHAT.CHAT_BOX />
-    </div>
-    </>
+    <Box display="flex" flexDirection="row" height="100dvh">
+      {/* Left: Chat List */}
+      <COMPONENTS.FEATURES.CHAT.CHAT_LIST/>
+      {/* Right: Chat Detail */}
+      <COMPONENTS.FEATURES.CHAT.CHAT_BOX/>
+    </Box>
   );
 };
 

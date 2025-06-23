@@ -1,6 +1,8 @@
 import { Box } from "@mui/material"
 import ChatItem from "./chatItem"
 import { useGetChatRoomsQuery } from "../../../redux/chatApiSlice"
+import { useSocket } from "../../../socket/socketProvider";
+import { useEffect } from "react";
 
 const ChatList:React.FC = () => {
 
@@ -11,6 +13,22 @@ const ChatList:React.FC = () => {
     error,
     refetch
   } = useGetChatRoomsQuery();
+
+  const socket = useSocket();
+
+  const sendChatListEvent = () => {
+    let payload = [];
+        payload = chatRooms?.data?.map((room:any) => room?._id)
+     socket.emit('joinChatListViewers', {chatRooms:payload})
+  }
+
+  useEffect(() => {
+    console.log('chat rooms updated', chatRooms.data);
+    if(chatRooms && chatRooms?.data?.length > 0) {
+      console.log('emiting chatrooms for list')
+      sendChatListEvent();
+    }
+  }, [chatRooms]);
 
   if (isLoading) {
     return <Box p={2}>Loading chat rooms...</Box>;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Container,
@@ -8,9 +8,11 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import { useSignInMutation } from '../../../redux/authApiSlice';
-import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {  useSelector } from 'react-redux';
+import { signInUser } from '../../../redux/authSlice';
+import { useAppDispatch } from '../../../redux/hook';
+
 
 type SignInFormValues = {
   email: string;
@@ -25,24 +27,17 @@ const SignIn: React.FC = () => {
   } = useForm<SignInFormValues>();
 
   const navigate = useNavigate()
-
-  const [login, {isLoading}] = useSignInMutation ()
+const dispatch = useAppDispatch();  
+const {loading:isLoading, errorr} = useSelector((state: any) => state.auth);
+  // const [login, {isLoading}] = useSignInMutation ()
 
   const onSubmit = async(data: SignInFormValues) => {
     console.log('Form Data:', data);
-    try{
-     const response = await login(data).unwrap()
-     console.log('response:', response)
-     if(response.data.token){
-       localStorage.setItem('token', response.data.token)
-       navigate('/chat')
-     }
-    }catch(error){
-      if(error instanceof AxiosError){
-        console.log('error:', error.response?.data)
-        alert(error.response?.data)
-      }
-    }
+
+   const response = await dispatch(signInUser(data)).unwrap()
+   if(response?.status){
+     navigate('/chat');
+   } 
   };
 
   return (

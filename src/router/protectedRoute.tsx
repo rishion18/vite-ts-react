@@ -1,13 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { useAppSelector } from "../redux/hook";
 
 const ProtectedRoute = () => {
-    const token = localStorage.getItem("token");
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-    if (!token) {
-        return <Navigate to="/sign-in" replace />;
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace />;
+  }
 
-    return <Outlet />;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

@@ -22,11 +22,28 @@ export const signInUser = createAsyncThunk(
   async (credentials: { email: string; password: string }, thunkAPI) => {
     try {
       const response = await axiosApi.post("/user/signin", credentials);
-      console.log("Response from signInUser:", response);
-      return response.data.data;
+      return response.data.data; 
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(axiosError.response?.data?.message || "Login failed");
+      return thunkAPI.rejectWithValue(
+        axiosError.response?.data?.message || "Login failed"
+      );
+    }
+  }
+);
+
+// Async thunk for session verification
+export const verifyUserSession = createAsyncThunk(
+  "auth/verifyUserSession",
+  async (_, thunkAPI) => {
+    try {
+      const response = await axiosApi.get("/user/me"); 
+      return response.data; 
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        axiosError.response?.data?.message || "Session expired"
+      );
     }
   }
 );
@@ -54,10 +71,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
-        console.log('data:', action.payload)
         const { user, token } = action.payload;
-        console.log("User signed in:", user);
-        console.log("Token received:", token);
         state.loading = false;
         state.user = user;
         state.isAuthenticated = true;
@@ -66,6 +80,21 @@ const authSlice = createSlice({
       .addCase(signInUser.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) ?? "Unknown error";
+      })
+      .addCase(verifyUserSession.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyUserSession.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      })
+      .addCase(verifyUserSession.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = action.payload as string;
       });
   },
 });

@@ -2,13 +2,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/hook";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/sign-in" replace />;
-  }
+  if (loading) return <>Loading........</> // custom loading screen
 
-  return <Outlet />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/sign-in" replace />;
 };
+
 
 export default ProtectedRoute;

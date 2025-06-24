@@ -5,10 +5,6 @@ import { useLogin } from "../hooks/auth/useLogin";
 import { useEffect } from "react";
 
 const AppRouter = () => {
-  const { verifyToken } = useLogin();
-  useEffect(() => {
-    verifyToken();
-  }, []);
   return (
     <Routes>
       <Route path="/" element={<h1>Home</h1>} />

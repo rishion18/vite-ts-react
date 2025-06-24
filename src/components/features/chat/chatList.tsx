@@ -23,7 +23,6 @@ const ChatList:React.FC = () => {
   }
 
   useEffect(() => {
-    console.log('chat rooms updated', chatRooms.data);
     if(chatRooms && chatRooms?.data?.length > 0) {
       console.log('emiting chatrooms for list')
       sendChatListEvent();

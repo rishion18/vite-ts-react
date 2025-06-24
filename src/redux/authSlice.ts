@@ -7,13 +7,15 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  isInitialized: boolean; // Add this to track if we've checked authentication
 }
 
 const initialState: AuthState = {
   user: null,
-  loading: false,
+  loading: true, // Start with loading true
   error: null,
   isAuthenticated: false,
+  isInitialized: false, // We haven't checked auth status yet
 };
 
 // Async thunk for login
@@ -55,12 +57,14 @@ const authSlice = createSlice({
     logout(state) {
       state.user = null;
       state.isAuthenticated = false;
+      state.isInitialized = true;
       axiosApi.defaults.headers.common["Authorization"] = "";
     },
     setAuthFromStorage(state, action) {
       const { user, token } = action.payload;
       state.user = user;
       state.isAuthenticated = !!token;
+      state.isInitialized = true;
       axiosApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     },
   },
@@ -75,11 +79,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = user;
         state.isAuthenticated = true;
+        state.isInitialized = true;
         axiosApi.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       })
       .addCase(signInUser.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) ?? "Unknown error";
+        state.isInitialized = true;
       })
       .addCase(verifyUserSession.pending, (state) => {
         state.loading = true;
@@ -89,11 +95,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.isAuthenticated = true;
+        state.isInitialized = true; // Mark as initialized
       })
       .addCase(verifyUserSession.rejected, (state, action) => {
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.isInitialized = true; // Mark as initialized even on failure
         state.error = action.payload as string;
       });
   },

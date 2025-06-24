@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Container,
@@ -8,10 +8,8 @@ import {
   Typography,
   Paper,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import {  useSelector } from 'react-redux';
-import { signInUser } from '../../../redux/authSlice';
-import { useAppDispatch } from '../../../redux/hook';
+import { useLogin } from '../../../hooks/auth/useLogin';
 
 
 type SignInFormValues = {
@@ -26,19 +24,17 @@ const SignIn: React.FC = () => {
     formState: { errors },
   } = useForm<SignInFormValues>();
 
-  const navigate = useNavigate()
-const dispatch = useAppDispatch();  
+//hooks
+const {login} = useLogin();
+
+//subscribing to states
 const {loading:isLoading, errorr} = useSelector((state: any) => state.auth);
-  // const [login, {isLoading}] = useSignInMutation ()
 
-  const onSubmit = async(data: SignInFormValues) => {
-    console.log('Form Data:', data);
 
-   const response = await dispatch(signInUser(data)).unwrap()
-   if(response?.status){
-     navigate('/chat');
-   } 
-  };
+const onSubmit = async(data: SignInFormValues) => {
+  console.log('Form Data:', data);
+  await login(data);
+};
 
   return (
     <Container maxWidth="sm">

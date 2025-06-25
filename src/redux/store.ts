@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { authApiSlice } from './authApiSlice'
 import { chatApiSlice } from './chatApiSlice'
 import { authReducer } from "./authSlice"; 
+import { chatReducer } from "./chatSlice";
 
 
 export const store  = configureStore({
@@ -9,6 +10,7 @@ export const store  = configureStore({
         [authApiSlice.reducerPath]: authApiSlice.reducer,
         [chatApiSlice.reducerPath]: chatApiSlice.reducer,
         auth: authReducer, 
+        chat: chatReducer
     },
   // Add the API middleware for caching, invalidation, polling, etc.
   middleware: (getDefaultMiddleware) =>

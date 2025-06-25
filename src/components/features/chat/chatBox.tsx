@@ -1,6 +1,7 @@
 import { Box, IconButton, TextField, Button, InputAdornment, Typography } from "@mui/material";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "../../../redux/hook";
 
 const ChatBox:React.FC = () => {
     const [message, setMessage] = useState("");
@@ -11,6 +12,14 @@ const ChatBox:React.FC = () => {
         setFile(e.target.files[0]);
       }
     };
+
+    const {messages} = useAppSelector((state) => state.chat);
+
+    useEffect(() => {
+      // This effect can be used to handle any side effects related to messages
+      console.log("Messages updated:", messages);
+      // You can also scroll to the bottom of the chat or perform other actions here
+    }, [messages]);
   
     const handleSend = () => {
       // Placeholder for send logic

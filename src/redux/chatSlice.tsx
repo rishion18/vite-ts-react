@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosApi from "../api/axios";
-import type { ChatRoom } from "../types/global";
 
 interface ChatState {
   chatRoom: ChatRoom | null;
@@ -41,6 +40,15 @@ const ChatSlice = createSlice({
     setSelectedChatRoom(state, action) {
       state.chatRoom = action.payload;
     },
+    addNewMessage(state, action){
+      state.messages = [...state.messages, action.payload];
+    },
+    removeMessage(state, action) {
+      const {messageId} = action.payload;
+      state.messages = state.messages.filter(
+        (message) => message._id !== messageId
+      );
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -60,5 +68,5 @@ const ChatSlice = createSlice({
   },
 });
 
-export const { setSelectedChatRoom } = ChatSlice.actions;
+export const { setSelectedChatRoom, addNewMessage, removeMessage } = ChatSlice.actions;
 export const chatReducer = ChatSlice.reducer;

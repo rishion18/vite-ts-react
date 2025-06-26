@@ -4,7 +4,6 @@ import { useGetChatRoomsQuery } from "../../../redux/chatApiSlice";
 import { useSocket } from "../../../socket/socketProvider";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import type { ChatRoom } from "../../../types/global";
 import { getChatRoom, setSelectedChatRoom } from "../../../redux/chatSlice";
 
 const ChatList: React.FC = () => {

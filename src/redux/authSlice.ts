@@ -40,7 +40,7 @@ export const verifyUserSession = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axiosApi.get("/user/me"); 
-      return response.data; 
+      return response.data.data; 
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string }>;
       return thunkAPI.rejectWithValue(
@@ -93,7 +93,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyUserSession.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.isAuthenticated = true;
         state.isInitialized = true; // Mark as initialized
       })

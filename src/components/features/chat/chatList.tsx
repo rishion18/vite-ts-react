@@ -3,7 +3,7 @@ import ChatItem from "./chatItem";
 import { useGetChatRoomsQuery } from "../../../redux/chatApiSlice";
 import { useSocket } from "../../../socket/socketProvider";
 import { useEffect } from "react";
-import { useAppDispatch } from "../../../redux/hook";
+import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import type { ChatRoom } from "../../../types/global";
 import { getChatRoom, setSelectedChatRoom } from "../../../redux/chatSlice";
 
@@ -18,12 +18,26 @@ const ChatList: React.FC = () => {
 
   const socket = useSocket();
   const dispatch = useAppDispatch();
+  const { chatRoom: currentRoom } = useAppSelector((state) => state.chat);
 
-  const sendChatListEvent = () => {
-    let payload = [];
-    payload = chatRooms?.data?.map((room: any) => room?._id);
-    socket.emit("joinChatListViewers", { chatRooms: payload });
-  };
+const sendChatListEvent = () => {
+  let payload: string[] = [];
+
+  console.log("Current room found while sending chat list event:", currentRoom);
+
+  payload = chatRooms?.data
+    ?.filter((room: ChatRoom) => {
+      if (currentRoom?._id) {
+        return room._id !== currentRoom._id;
+      }
+      return true; 
+    })
+    ?.map((room: ChatRoom) => room._id) || [];
+
+  console.log("Emitting chat list event with payload:", payload);
+  socket.emit("joinChatListViewers", { chatRooms: payload });
+};
+
 
   const leaveChatListEvent = () => {
     let payload = [];
@@ -49,8 +63,16 @@ const ChatList: React.FC = () => {
 
   const handleChatItemClick = (chatRoom: ChatRoom) => {
     console.log(`Chat item clicked: ${chatRoom._id}`);
-    //join room event here
+    //join room and leave chatList
     socket.emit("joinChatRoomViewers", { chatRoomId: chatRoom._id });
+    socket.emit("leaveChatListViewers", { chatRooms: [chatRoom._id] });
+    //leave previous room if any
+    const previousRoomId = currentRoom?._id;
+    if (previousRoomId) {
+      console.log(`Leaving previous chat room: ${previousRoomId}`);
+      leaveChatRoom(previousRoomId);
+      socket.emit("joinChatListViewers", { chatRooms: [previousRoomId] });
+    }
     dispatch(setSelectedChatRoom(chatRoom));
     dispatch(getChatRoom(chatRoom._id));
   };

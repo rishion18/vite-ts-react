@@ -39,6 +39,7 @@ declare global {
     type: ChatRoomType;
     users: ChatRoomUser[];
     participants: Types.ObjectId[];
+    latestMessage?: Message;
     createdAt: Date;
     updatedAt: Date;
   }

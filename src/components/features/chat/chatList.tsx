@@ -62,6 +62,7 @@ const sendChatListEvent = () => {
 
   const handleChatItemClick = (chatRoom: ChatRoom) => {
     console.log(`Chat item clicked: ${chatRoom._id}`);
+    if(currentRoom?._id === chatRoom._id) return
     //join room and leave chatList
     socket.emit("joinChatRoomViewers", { chatRoomId: chatRoom._id });
     socket.emit("leaveChatListViewers", { chatRooms: [chatRoom._id] });
@@ -92,12 +93,12 @@ const sendChatListEvent = () => {
       overflow="auto"
       borderRight="1px solid #eee"
     >
-      {chatRooms?.data?.map((item: any) => (
+      {chatRooms?.data?.map((item: ChatRoom) => (
         <div key={item._id} onClick={() => handleChatItemClick(item)}>
           <ChatItem
             key={item._id}
-            message={`Chat message preview for chat }`}
-            unreadCount={item % 2 === 0 ? item : 0}
+            message={item.latestMessage?.text || "No messages yet"}
+            unreadCount={0}
           />
         </div>
       ))}

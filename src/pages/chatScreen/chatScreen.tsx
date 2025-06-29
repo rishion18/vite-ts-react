@@ -1,17 +1,27 @@
-import { Box } from "@mui/material";
-import { COMPONENTS } from "../../components";
 import React from "react";
+import { COMPONENTS } from "../../components";
+import ResponsiveChatLayout from "../../components/layout/ResponsiveChatLayout";
 
 const ChatScreen: React.FC = () => {
+  const handleLogout = () => {
+    // Implement your logout logic here
+    console.log("Logout clicked");
+  };
 
+  const handleChatItemSelect = () => {
+    // Optional: Additional logic when chat item is selected on mobile
+    console.log("Chat item selected on mobile");
+  };
 
   return (
-    <Box display="flex" flexDirection="row" height="100dvh">
-      {/* Left: Chat List */}
-      <COMPONENTS.FEATURES.CHAT.CHAT_LIST/>
-      {/* Right: Chat Detail */}
-      <COMPONENTS.FEATURES.CHAT.CHAT_BOX/>
-    </Box>
+    <ResponsiveChatLayout
+      chatList={<COMPONENTS.FEATURES.CHAT.CHAT_LIST />}
+      userProfilePhoto="/path-to-user-photo.jpg" // Replace with actual photo URL
+      onLogout={handleLogout}
+      onChatItemSelect={handleChatItemSelect}
+    >
+      <COMPONENTS.FEATURES.CHAT.CHAT_BOX />
+    </ResponsiveChatLayout>
   );
 };
 

@@ -87,7 +87,7 @@ const sendChatListEvent = () => {
 
   return (
     <Box
-      width={{ xs: "40%", md: "30%", lg: "25%" }}
+      width={{ xs: "100%", md: "30%", lg: "25%" }}
       bgcolor="#f5f5f5"
       p={2}
       overflow="auto"

@@ -67,6 +67,12 @@ const ChatBox: React.FC = () => {
     [currentRoom?._id, dispatch]
   );
 
+  useEffect(() => {
+    if(Array.isArray(messages) && messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages])
+
   // 2️⃣ Initial load on room change
   useEffect(() => {
     if (!currentRoom?._id) return;

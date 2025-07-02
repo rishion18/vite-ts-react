@@ -1,13 +1,16 @@
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "./router/appRouter";
 import AuthBootstrap from "./router/authBootstrap";
+import { ThemeModeProvider } from "./theme/themeContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthBootstrap>
-        <AppRouter />
-      </AuthBootstrap>
+      <ThemeModeProvider>
+        <AuthBootstrap>
+          <AppRouter />
+        </AuthBootstrap>
+      </ThemeModeProvider>
     </BrowserRouter>
   );
 }

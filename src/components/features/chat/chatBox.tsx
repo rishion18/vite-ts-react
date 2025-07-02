@@ -6,6 +6,7 @@ import {
   InputAdornment,
   Typography,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import {
@@ -31,6 +32,8 @@ const ChatBox: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const dispatch = useAppDispatch();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const theme = useTheme();
 
   const {
     chatRoom: currentRoom,
@@ -229,7 +232,7 @@ const ChatBox: React.FC = () => {
 
       <Box
         p={2}
-        borderTop="1px solid #eee"
+        borderTop={`1px solid ${theme.palette.divider}`}
         display="flex"
         alignItems="center"
         gap={1}

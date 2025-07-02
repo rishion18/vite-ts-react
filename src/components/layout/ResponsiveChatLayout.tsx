@@ -63,11 +63,13 @@ const ResponsiveChatLayout: React.FC<ResponsiveChatLayoutProps> = ({
   // Enhanced ChatList wrapper that handles mobile selection
   const ChatListWrapper = ({ inDrawer = false }) => (
     <Box
+      
       sx={{
         height: inDrawer ? '100%' : 'auto',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative'
+        position: 'relative',
+        width: inDrawer ? '100%' : '400px',
       }}
       onClick={inDrawer ? handleChatItemSelect : undefined}
     >

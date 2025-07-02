@@ -1,10 +1,12 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import ChatItem from "./chatItem";
 import { useGetChatRoomsQuery } from "../../../redux/chatApiSlice";
 import { useSocket } from "../../../socket/socketProvider";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { getChatRoom, setSelectedChatRoom } from "../../../redux/chatSlice";
+import Logo from "./logo";
+import ChatListFilters from "./chatListFilters";
 
 const ChatList: React.FC = () => {
   const {
@@ -19,24 +21,29 @@ const ChatList: React.FC = () => {
   const dispatch = useAppDispatch();
   const { chatRoom: currentRoom } = useAppSelector((state) => state.chat);
 
-const sendChatListEvent = () => {
-  let payload: string[] = [];
+  const theme = useTheme();
 
-  console.log("Current room found while sending chat list event:", currentRoom);
+  const sendChatListEvent = () => {
+    let payload: string[] = [];
 
-  payload = chatRooms?.data
-    ?.filter((room: ChatRoom) => {
-      if (currentRoom?._id) {
-        return room._id !== currentRoom._id;
-      }
-      return true; 
-    })
-    ?.map((room: ChatRoom) => room._id) || [];
+    console.log(
+      "Current room found while sending chat list event:",
+      currentRoom
+    );
 
-  console.log("Emitting chat list event with payload:", payload);
-  socket.emit("joinChatListViewers", { chatRooms: payload });
-};
+    payload =
+      chatRooms?.data
+        ?.filter((room: ChatRoom) => {
+          if (currentRoom?._id) {
+            return room._id !== currentRoom._id;
+          }
+          return true;
+        })
+        ?.map((room: ChatRoom) => room._id) || [];
 
+    console.log("Emitting chat list event with payload:", payload);
+    socket.emit("joinChatListViewers", { chatRooms: payload });
+  };
 
   const leaveChatListEvent = () => {
     let payload = [];
@@ -62,7 +69,7 @@ const sendChatListEvent = () => {
 
   const handleChatItemClick = (chatRoom: ChatRoom) => {
     console.log(`Chat item clicked: ${chatRoom._id}`);
-    if(currentRoom?._id === chatRoom._id) return
+    if (currentRoom?._id === chatRoom._id) return;
     //join room and leave chatList
     socket.emit("joinChatRoomViewers", { chatRoomId: chatRoom._id });
     socket.emit("leaveChatListViewers", { chatRooms: [chatRoom._id] });
@@ -87,21 +94,76 @@ const sendChatListEvent = () => {
 
   return (
     <Box
-      width={{ xs: "100%", md: "30%", lg: "25%" }}
-      bgcolor="#f5f5f5"
-      p={2}
-      overflow="auto"
-      borderRight="1px solid #eee"
+      width={"100%"}
+      height={"100%"}
+      display="flex"
+      flexDirection="column"
+      sx={{
+        borderRight: `1px solid ${theme.palette.divider}`
+      }}
     >
-      {chatRooms?.data?.map((item: ChatRoom) => (
-        <div key={item._id} onClick={() => handleChatItemClick(item)}>
-          <ChatItem
-            key={item._id}
-            message={item.latestMessage?.text || "No messages yet"}
-            unreadCount={0}
-          />
-        </div>
-      ))}
+      {/* Sticky Header with Logo */}
+      <Box
+        p={2}
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 1000,
+          backgroundColor: theme.palette.background.default,
+        }}
+      >
+        <Logo />
+        <ChatListFilters/>
+      </Box>
+
+      {/* Scrollable Chat Items */}
+      <Box
+        flex={1}
+        overflow="auto"
+        padding={2}
+        sx={{
+          // WhatsApp-style scrollbar styles
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: '4px',
+            '&:hover': {
+              backgroundColor: theme.palette.action.hover,
+            }
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: theme.palette.background.default,
+          },
+          // Firefox scrollbar
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${theme.palette.background.paper} ${theme.palette.background.default}`,
+        }}
+      >
+        {chatRooms?.data?.map((item: any, index: number) => (
+          <div key={index} onClick={() => handleChatItemClick(item)}>
+            <Box
+              width={"100%"}
+              bgcolor={theme.palette.background.default}
+              p={2}
+              borderRadius={2}
+              sx={{
+                ":hover": {
+                  backgroundColor: theme.palette.action.hover,
+                  cursor: "pointer",
+                }
+              }}
+            >
+              <ChatItem
+                key={index}
+                message={item.latestMessage?.text || "No messages yet"}
+                unreadCount={0}
+              />
+            </Box>
+          </div>
+        ))}
+      </Box>
     </Box>
   );
 };

@@ -1,27 +1,36 @@
 import { Box, useTheme } from "@mui/material";
 import ChatItem from "./chatItem";
-import { useGetChatRoomsQuery } from "../../../redux/chatApiSlice";
 import { useSocket } from "../../../socket/socketProvider";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { getChatRoom, setSelectedChatRoom } from "../../../redux/chatSlice";
+import {
+  getAllChatRooms,
+  getChatRoom,
+  setSelectedChatRoom,
+  updateChatRooms,
+} from "../../../redux/chatSlice";
 import Logo from "./logo";
 import ChatListFilters from "./chatListFilters";
 
 const ChatList: React.FC = () => {
-  const {
-    data: chatRooms,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetChatRoomsQuery();
-
   const socket = useSocket();
   const dispatch = useAppDispatch();
-  const { chatRoom: currentRoom } = useAppSelector((state) => state.chat);
+
+  const {
+    chatRoom: currentRoom,
+    chatRooms,
+    chatRoomsLoading,
+    chatRoomsError,
+  } = useAppSelector((state) => state.chat);
 
   const theme = useTheme();
+  const { user } = useAppSelector((state) => state.auth);
+
+  console.log("userid", user?.id);
+
+  useEffect(() => {
+    dispatch(getAllChatRooms());
+  }, []);
 
   const sendChatListEvent = () => {
     let payload: string[] = [];
@@ -32,7 +41,7 @@ const ChatList: React.FC = () => {
     );
 
     payload =
-      chatRooms?.data
+      chatRooms
         ?.filter((room: ChatRoom) => {
           if (currentRoom?._id) {
             return room._id !== currentRoom._id;
@@ -47,12 +56,12 @@ const ChatList: React.FC = () => {
 
   const leaveChatListEvent = () => {
     let payload = [];
-    payload = chatRooms?.data?.map((room: any) => room?._id);
+    payload = chatRooms?.map((room: any) => room?._id);
     socket.emit("leaveChatListViewers", { chatRooms: payload });
   };
 
   useEffect(() => {
-    if (chatRooms && chatRooms?.data?.length > 0) {
+    if (chatRooms && chatRooms?.length > 0) {
       console.log("emiting chatrooms for list");
       sendChatListEvent();
     }
@@ -70,25 +79,49 @@ const ChatList: React.FC = () => {
   const handleChatItemClick = (chatRoom: ChatRoom) => {
     console.log(`Chat item clicked: ${chatRoom._id}`);
     if (currentRoom?._id === chatRoom._id) return;
-    //join room and leave chatList
+    //join room and leave chatList taken care at backend
     socket.emit("joinChatRoomViewers", { chatRoomId: chatRoom._id });
-    socket.emit("leaveChatListViewers", { chatRooms: [chatRoom._id] });
+    // socket.emit("leaveChatListViewers", { chatRooms: [chatRoom._id] });
     //leave previous room if any
     const previousRoomId = currentRoom?._id;
     if (previousRoomId) {
       console.log(`Leaving previous chat room: ${previousRoomId}`);
+      //when user leaves this previous room , it will also be added to chatlist again
       leaveChatRoom(previousRoomId);
-      socket.emit("joinChatListViewers", { chatRooms: [previousRoomId] });
+      // socket.emit("joinChatListViewers", { chatRooms: [previousRoomId] });
     }
     dispatch(setSelectedChatRoom(chatRoom));
     dispatch(getChatRoom(chatRoom._id));
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleIncomingMessage = (data: any) => {
+      const mb = {
+        _id: data.message._id,
+        text: data.message.text,
+        sender: data.message.sender,
+        createdAt: data.message.createdAt,
+        type: data.message.type,
+        fileUrl: data.message.fileUrl,
+        reciever: data.message.reciever,
+      };
+      console.log("Incoming message from chatListUpdate", data.message);
+      dispatch(updateChatRooms(data.message));
+    };
+
+    socket.on("chatListUpdate", handleIncomingMessage);
+    return () => {
+      // socket.off("chatListUpdate", handleIncomingMessage);
+    };
+  }, [socket, dispatch]);
+
+  if (chatRoomsLoading) {
     return <Box p={2}>Loading chat rooms...</Box>;
   }
 
-  if (isError) {
+  if (chatRoomsError) {
     return <Box p={2}>Error loading chat rooms</Box>;
   }
 
@@ -99,21 +132,21 @@ const ChatList: React.FC = () => {
       display="flex"
       flexDirection="column"
       sx={{
-        borderRight: `1px solid ${theme.palette.divider}`
+        borderRight: `1px solid ${theme.palette.divider}`,
       }}
     >
       {/* Sticky Header with Logo */}
       <Box
         p={2}
         sx={{
-          position: 'sticky',
+          position: "sticky",
           top: 0,
           zIndex: 1000,
           backgroundColor: theme.palette.background.default,
         }}
       >
         <Logo />
-        <ChatListFilters/>
+        <ChatListFilters />
       </Box>
 
       {/* Scrollable Chat Items */}
@@ -123,25 +156,25 @@ const ChatList: React.FC = () => {
         padding={2}
         sx={{
           // WhatsApp-style scrollbar styles
-          '&::-webkit-scrollbar': {
-            width: '6px',
+          "&::-webkit-scrollbar": {
+            width: "6px",
           },
-          '&::-webkit-scrollbar-thumb': {
+          "&::-webkit-scrollbar-thumb": {
             backgroundColor: theme.palette.background.paper,
-            borderRadius: '4px',
-            '&:hover': {
+            borderRadius: "4px",
+            "&:hover": {
               backgroundColor: theme.palette.action.hover,
-            }
+            },
           },
-          '&::-webkit-scrollbar-track': {
+          "&::-webkit-scrollbar-track": {
             backgroundColor: theme.palette.background.default,
           },
           // Firefox scrollbar
-          scrollbarWidth: 'thin',
+          scrollbarWidth: "thin",
           scrollbarColor: `${theme.palette.background.paper} ${theme.palette.background.default}`,
         }}
       >
-        {chatRooms?.data?.map((item: any, index: number) => (
+        {chatRooms?.map((item: ChatRoom, index: number) => (
           <div key={index} onClick={() => handleChatItemClick(item)}>
             <Box
               width={"100%"}
@@ -152,13 +185,14 @@ const ChatList: React.FC = () => {
                 ":hover": {
                   backgroundColor: theme.palette.action.hover,
                   cursor: "pointer",
-                }
+                },
               }}
             >
               <ChatItem
                 key={index}
                 message={item.latestMessage?.text || "No messages yet"}
                 unreadCount={0}
+                chatItem={item}
               />
             </Box>
           </div>

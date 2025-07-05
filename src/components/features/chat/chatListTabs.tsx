@@ -16,6 +16,7 @@ const ChatListFilterChips: React.FC = () => {
           sx={{
             borderRadius: "20px", // WhatsApp-style pill shape
             borderColor: theme.palette.divider,
+            color: theme.palette.text.secondary,
             backgroundColor: theme.palette.background.default,
             "&:hover": {
               backgroundColor: theme.palette.background.paper,

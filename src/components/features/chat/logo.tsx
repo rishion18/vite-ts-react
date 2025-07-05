@@ -6,7 +6,7 @@ const Logo: React.FC = () => {
     <Box width={100} paddingX={2}>
       <Typography
         variant="h5"
-        color="white"
+        color={theme.palette.custom.heading}
         sx={{
           fontWeight: theme.palette.custom.headingWeight,
           letterSpacing: "0.01em",

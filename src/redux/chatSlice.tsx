@@ -9,6 +9,9 @@ interface Pagination {
 
 interface ChatState {
   chatRoom: ChatRoom | null;
+  chatRooms: ChatRoom[];
+  chatRoomsLoading: boolean;
+  chatRoomsError: string | null;
   messages: any[];
   loading: boolean;
   messageLoading: boolean;
@@ -19,6 +22,9 @@ interface ChatState {
 
 const initialState: ChatState = {
   chatRoom: null,
+  chatRooms: [],
+  chatRoomsLoading: false,
+  chatRoomsError: null,
   messages: [],
   loading: false,
   messageLoading: false,
@@ -76,6 +82,21 @@ export const getMessages = createAsyncThunk(
   }
 );
 
+export const getAllChatRooms = createAsyncThunk(
+  "chat/getAllChatRooms",
+  async (_, thunkAPI) => {
+    try {
+      const response = await axiosApi.get(`/chat/get-chat-rooms`);
+      return response.data.data; // Assuming the response contains the chat room data
+    } catch (error) {
+      const axiosError = error as Error;
+      return thunkAPI.rejectWithValue(
+        axiosError.message || "Failed to fetch chat room"
+      );
+    }
+  }
+);
+
 const ChatSlice = createSlice({
   name: "chat",
   initialState,
@@ -99,6 +120,34 @@ const ChatSlice = createSlice({
       } else {
         state.messages = action.payload.messages;
       }
+    },
+    updateChatRooms(state, action) {
+      const newMessage = action.payload;
+      console.log("newMessage in reducer", newMessage);
+      if (!state.chatRooms) return; // prevent error if null or undefined
+
+      // Update the chat room
+      state.chatRooms = state.chatRooms.map((chatRoom: ChatRoom) => {
+        if (chatRoom._id === newMessage.chatRoomId) {
+          return {
+            ...chatRoom,
+            latestMessage: newMessage,
+          };
+        }
+        return chatRoom;
+      });
+
+      console.log(
+        "state.chatRooms after latest message updation",
+        state.chatRooms
+      );
+
+      // Sort chat rooms by latestMessage.createdAt
+      state.chatRooms.sort((a: ChatRoom, b: ChatRoom) => {
+        const aDate = new Date(a.latestMessage?.createdAt || 0).getTime();
+        const bDate = new Date(b.latestMessage?.createdAt || 0).getTime();
+        return bDate - aDate;
+      });
     },
   },
   extraReducers: (builder) => {
@@ -125,6 +174,18 @@ const ChatSlice = createSlice({
         const { messages, pagination } = action.payload;
         state.messages = [...messages, ...state.messages];
         state.pagination = pagination || initialState.pagination;
+      })
+      .addCase(getAllChatRooms.pending, (state) => {
+        state.chatRoomsLoading = true;
+        state.chatRoomsError = null;
+      })
+      .addCase(getAllChatRooms.fulfilled, (state, action) => {
+        state.chatRoomsLoading = false;
+        state.chatRooms = action.payload;
+      })
+      .addCase(getAllChatRooms.rejected, (state, action) => {
+        state.chatRoomsLoading = false;
+        state.chatRoomsError = action.payload as string;
       });
   },
 });
@@ -134,5 +195,6 @@ export const {
   addNewMessage,
   removeMessage,
   setMessages,
+  updateChatRooms,
 } = ChatSlice.actions;
 export const chatReducer = ChatSlice.reducer;

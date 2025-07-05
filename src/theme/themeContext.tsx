@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { ThemeProvider, CssBaseline, useMediaQuery } from '@mui/material';
-import { getAppTheme } from './theme'; // your theme.ts file that uses getDesignTokens
+import { getAppTheme } from './theme';
 
 // Define the allowed theme modes
 export type ColorMode = 'light' | 'dark';

@@ -9,6 +9,7 @@ declare module '@mui/material/styles' {
       textSecondary: string;
       headingPrimary: string;
       headingWeight: number;
+      appViolet: string;
     };
   }
 
@@ -19,6 +20,7 @@ declare module '@mui/material/styles' {
       textSecondary?: string;
       headingPrimary?: string;
       headingWeight?: number;
+      appViolet?: string;
     };
   }
 }
@@ -33,7 +35,8 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
             cardBg: '#ffffff',
             textSecondary: '#555555',
             headingPrimary: '#000000',
-            headingWeight: 500,
+            headingWeight: 600,
+            appViolet: '#9C27B0',
           },
           text: {
             primary: '#000000',
@@ -54,10 +57,11 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
             textSecondary: '#cccccc',
             headingPrimary: '#ffffff',
             headingWeight: 600,
+            appViolet: '#9C27B0',
           },
           text: {
             primary: '#ffffff',
-            secondary: '#cccccc',
+            secondary: '#a7a5a5',
             disabled: '#888888',
           },
           background: {

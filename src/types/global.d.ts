@@ -7,6 +7,8 @@ declare global {
   interface ChatRoomUser {
     userId: Types.ObjectId;
     role: ChatRoomRole;
+    avatar: string;
+    userName: string;
   }
 
   type MessageType =

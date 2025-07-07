@@ -4,6 +4,7 @@ import { useSocket } from "../../../socket/socketProvider";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import {
+  clearUnreadCount,
   getAllChatRooms,
   getChatRoom,
   setSelectedChatRoom,
@@ -92,21 +93,13 @@ const ChatList: React.FC = () => {
     }
     dispatch(setSelectedChatRoom(chatRoom));
     dispatch(getChatRoom(chatRoom._id));
+    dispatch(clearUnreadCount({chatRoomId: chatRoom._id}));
   };
 
   useEffect(() => {
     if (!socket) return;
 
     const handleIncomingMessage = (data: any) => {
-      const mb = {
-        _id: data.message._id,
-        text: data.message.text,
-        sender: data.message.sender,
-        createdAt: data.message.createdAt,
-        type: data.message.type,
-        fileUrl: data.message.fileUrl,
-        reciever: data.message.reciever,
-      };
       console.log("Incoming message from chatListUpdate", data.message);
       dispatch(updateChatRooms(data.message));
     };
@@ -191,7 +184,7 @@ const ChatList: React.FC = () => {
               <ChatItem
                 key={index}
                 message={item.latestMessage?.text || "No messages yet"}
-                unreadCount={0}
+                unreadCount={item.unreadCount}
                 chatItem={item}
               />
             </Box>

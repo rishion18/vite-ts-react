@@ -36,15 +36,17 @@ declare global {
     updatedAt: Date;
   }
 
-  interface ChatRoom {
-    _id: Types.ObjectId;
-    type: ChatRoomType;
-    users: ChatRoomUser[];
-    participants: Types.ObjectId[];
-    latestMessage?: Message;
-    createdAt: Date;
-    updatedAt: Date;
-  }
+export interface ChatRoom {
+  _id: Types.ObjectId | string;
+  type: ChatRoomType;
+  users: ChatRoomUser[];
+  participants: (Types.ObjectId | string)[];
+  latestMessage?: Message;
+  unreadCount?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  __v?: number;
+}
 }
 
 export {};

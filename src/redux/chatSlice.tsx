@@ -105,7 +105,9 @@ const ChatSlice = createSlice({
       state.chatRoom = action.payload;
     },
     addNewMessage(state, action) {
-      state.messages = [...state.messages, action.payload];
+      const { chatRoomId } = action.payload;
+      if (state.chatRoom?._id !== chatRoomId) return;
+      state.messages.push(action.payload);
     },
     removeMessage(state, action) {
       const { messageId } = action.payload;
@@ -132,6 +134,7 @@ const ChatSlice = createSlice({
           return {
             ...chatRoom,
             latestMessage: newMessage,
+            unreadCount: (chatRoom.unreadCount || 0) + 1,
           };
         }
         return chatRoom;
@@ -147,6 +150,18 @@ const ChatSlice = createSlice({
         const aDate = new Date(a.latestMessage?.createdAt || 0).getTime();
         const bDate = new Date(b.latestMessage?.createdAt || 0).getTime();
         return bDate - aDate;
+      });
+    },
+    clearUnreadCount(state, action) {
+      const { chatRoomId } = action.payload;
+      state.chatRooms = state.chatRooms.map((chatRoom: ChatRoom) => {
+        if (chatRoom._id === chatRoomId) {
+          return {
+            ...chatRoom,
+            unreadCount: 0,
+          };
+        }
+        return chatRoom;
       });
     },
   },
@@ -196,5 +211,6 @@ export const {
   removeMessage,
   setMessages,
   updateChatRooms,
+  clearUnreadCount,
 } = ChatSlice.actions;
 export const chatReducer = ChatSlice.reducer;

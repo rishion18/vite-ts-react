@@ -31,7 +31,7 @@ const userName = otherUser?.userName;
       <Box position="relative" zIndex={1}>
         <Badge
           color="primary"
-          badgeContent={unreadCount > 0 ? unreadCount : null}
+          // badgeContent={unreadCount > 0 ? unreadCount : null}
           overlap="circular"
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
@@ -98,7 +98,7 @@ const userName = otherUser?.userName;
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              padding: 1,
+              padding: 1.3,
               bgcolor: theme.palette.custom.appViolet,
             }}
           >
@@ -106,7 +106,7 @@ const userName = otherUser?.userName;
              fontSize={12}
              color={'white'}
             >
-              3
+              {unreadCount || 0}
             </Typography>
           </Box>
         </Box>

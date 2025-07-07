@@ -124,7 +124,7 @@ const ChatBox: React.FC = () => {
     const handleIncomingMessage = (data: any) => {
       // Only inject if we’ve finished the first load
       if (!initialLoadDone.current) return;
-
+     console.log('message in box', data.message);
       const mb = {
         _id: data.message._id,
         text: data.message.text,
@@ -136,7 +136,7 @@ const ChatBox: React.FC = () => {
       };
       // don’t double-add
       if(mb.sender !== user?.id){
-        dispatch(addNewMessage(mb));
+        dispatch(addNewMessage(data.message));
         scrollToBottom();
       } 
     };

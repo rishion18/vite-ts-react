@@ -23,6 +23,7 @@ import {
   addNewMessage,
   setMessages,
   getMessages,
+  updateDeliveryStatus,
 } from "../../../redux/chatSlice";
 
 const PAGE_SIZE = 20;
@@ -141,7 +142,13 @@ const ChatBox: React.FC = () => {
       } 
     };
 
-    socket.on("messageInRoom", handleIncomingMessage);
+    const handleDeliveryStatus = (data: any) => {
+        console.log('delivery status socket event:', data);
+        const {status, message} = data;
+        console.log('payload for delivery status:', {_id: message._id, status});
+        dispatch(updateDeliveryStatus({_id: message._id, status}));
+    }
+    socket.on('deliveryStatus', handleDeliveryStatus);
     return () => {
       socket.off("messageInRoom", handleIncomingMessage);
     };
@@ -171,6 +178,7 @@ const ChatBox: React.FC = () => {
     if (!message.trim()) return;
     const mb = {
       _id: Date.now().toString(),
+      chatRoomId: currentRoom?._id,
       text: message,
       type: "text",
       fileUrl: "",

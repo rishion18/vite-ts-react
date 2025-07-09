@@ -34,6 +34,7 @@ declare global {
     readBy: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
+    deliveryStatus?: string; // 'sent' | 'delivered' | 'read' | 'failed'
   }
 
 export interface ChatRoom {

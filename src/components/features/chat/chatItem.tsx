@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Avatar, Badge, Box, Typography, useTheme } from "@mui/material";
 import { useAppSelector } from "../../../redux/hook";
 import { formatChatTimestamp } from "./helper";
@@ -16,8 +16,17 @@ const ChatItem: React.FC<ChatItemProps> = ({
   chatItem,
 }) => {
   
-  console.log("chatitem", chatItem);
+  useEffect(() => {
+    console.log('chat item changed ');
+  }, [chatItem])
+
+
+
   const { user } = useAppSelector((state) => state.auth);
+  useEffect(() => {
+    console.log('user  changed ');
+  }, [user])
+
 const otherUser = chatItem?.users?.find((item: any) => item._id !== user?.id);
 const avatar = otherUser?.avatar;
 const userName = otherUser?.userName;

@@ -245,9 +245,10 @@ const ChatBubble: React.FC<{
                 textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
               }}
             >
-              {message.readBy && message.readBy.length > 1 ? "✓✓" : "✓"}
+              {message.deliveryStatus === 'delivered' ? "✓✓" : message.deliveryStatus === 'savedInDb' ? "✓" : "✗"}
             </Typography>
           )}
+          {/* <p style={{color: 'red'}}>{JSON.stringify(message)}</p> */}
         </Box>
       </Box>
     </Box>

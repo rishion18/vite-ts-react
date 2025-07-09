@@ -106,7 +106,11 @@ const ChatSlice = createSlice({
     },
     addNewMessage(state, action) {
       const { chatRoomId } = action.payload;
-      if (state.chatRoom?._id !== chatRoomId) return;
+      console.log('action.payload in addNewMessage', action.payload);
+      if (state.chatRoom?._id !== chatRoomId){
+        console.log('state.chatRoom._id !== chatRoomId');
+        return;
+      }
       state.messages.push(action.payload);
     },
     removeMessage(state, action) {
@@ -164,6 +168,22 @@ const ChatSlice = createSlice({
         return chatRoom;
       });
     },
+    updateDeliveryStatus(state, action){
+      const {_id, status} = action.payload;
+      state.messages = state.messages.map((message: Message) => {
+        if(message._id === _id){
+          console.log('setting deliveryStatus to ', {
+            ...message,
+            deliveryStatus: status
+          });
+          return {
+            ...message,
+            deliveryStatus: status
+          }
+        }
+        return message;
+      });
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -212,5 +232,6 @@ export const {
   setMessages,
   updateChatRooms,
   clearUnreadCount,
+  updateDeliveryStatus
 } = ChatSlice.actions;
 export const chatReducer = ChatSlice.reducer;

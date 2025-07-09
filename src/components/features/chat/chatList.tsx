@@ -25,10 +25,7 @@ const ChatList: React.FC = () => {
   } = useAppSelector((state) => state.chat);
 
   const theme = useTheme();
-  const { user } = useAppSelector((state) => state.auth);
-
-  console.log("userid", user?.id);
-
+   
   useEffect(() => {
     dispatch(getAllChatRooms());
   }, []);
